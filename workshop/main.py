@@ -5,7 +5,7 @@ from time import monotonic, sleep
 from pixel import setPixel
 from hologram import formatMsg, ip, port
 
-DEVICEKEY = "NdWiNVXif"
+DEVICEKEY = "NdWiNVXi"
 
 RESET_PIN = DigitalInOut(D2)
 RESET_PIN.direction = Direction.OUTPUT
@@ -58,7 +58,7 @@ def sendCommand(cmd, wait, success):
 
 def disconnect():
     # Disconnect / shutdown modem connection
-    if not sendCommand("AT+CIPSHUT\r\n", 65, "SHUT OK"):
+    if not sendCommand("AT+CIPCLOSE=1\r\n", 4, "CLOSE OK"):
         return False
     return True
 
@@ -103,17 +103,12 @@ def sendMessage(message):
         return False
 
     # Set message length
-    # msgLength = len(fullMessage)
-    # if not sendCommand("AT+CIPSEND=1," + str(msgLength) + "\r\n", 5, ">"):
-    #     return False
-    if not sendCommand("AT+CIPQSEND=1\r\n", 2, "OK"):
-        return False
-
-    if not sendCommand("AT+CIPSEND=1\r\n", 2, ">"):
+    msgLength = len(fullMessage)
+    if not sendCommand("AT+CIPSEND=1," + str(msgLength) + "\r\n", 5, ">"):
         return False
 
     # Send string to server
-    if not sendCommand(fullMessage, 60, "DATA ACCEPT"):
+    if not sendCommand(fullMessage, 60, "OK"):
         return False
 
     # Wait for TCP to close
