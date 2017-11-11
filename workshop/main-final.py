@@ -111,10 +111,6 @@ def sendMessage(message):
     if not sendCommand(fullMessage, 60, "OK"):
         return False
 
-    # Wait for TCP to close
-    # if not sendCommand("", 10, "CLOSED"):
-    #     return False
-
     return True
 
 
