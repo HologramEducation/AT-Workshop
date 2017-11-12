@@ -46,18 +46,19 @@ def sendCommand(cmd, wait, success, fail="ERROR"):
             data = uart.read(64) # read response
             if data != None:
             	datastr = ''.join([chr(b) for b in data]) # convert bytearray to string
-            	response = datastr
-                if success or fail in response:
+                if success or fail in datastr:
+                    response = datastr
                     break
 
-    if fail in response:
+    if success in response:
+        return True
+    elif fail in response:
         print("ERROR: " + cmd)
         print(response)
         return False
-    elif success in response:
-        return True
     else:
         print("TIMEOUT: " + cmd)
+        #print(response)
         return False
 
 
@@ -122,6 +123,16 @@ def sendMessage(message):
 
     return True
 
+def sendResponse(responseMsg = "RECEIVE OK"):
+    # Send a message back to server after receiving data
+    if not sendCommand("AT+CIPSEND=0," + str(len(responseMsg)) + "\r\n", 5, ">"):
+        return False
+
+    # Send string to server
+    if not sendCommand(responseMsg, 60, "SEND OK"):
+        return False
+
+    return True
 
 ########################################################
 print("### PROJECT STARTUP #############################")
@@ -189,7 +200,10 @@ if NET_CONNECT:
 
 while True:
     data = uart.read(64) # check for any inbound data
-    if data != None:
+
+    if data != None and "+RECEIVE" in data:
         datastr = ''.join([chr(b) for b in data]) # convert bytearray to string
         print(datastr)
+        sendResponse()
+
     sleep(5)
