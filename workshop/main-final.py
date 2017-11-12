@@ -97,6 +97,10 @@ def connect():
     if not sendCommand("AT+CIFSR\r\n", 2, "."):
         return False
 
+    # Start inbound server
+    if not sendCommand("AT+CIPSERVER=1,4010\r\n", 2, "SERVER OK"):
+        return False
+
     return True
 
 def sendMessage(message):
@@ -182,12 +186,10 @@ if NET_CONNECT:
 # ########################################################
 # print("### RECEIVE MESSAGE #############################")
 # ########################################################
-#
-# while True:
-#
-#     print("AT+XX ~XX seconds")
-#     if "OK" not in sendCommand("XX", 0000):
-#         print("Error @ Get local IP address")
-#         break
-#
-#     break
+
+while True:
+    data = uart.read(64) # check for any inbound data
+    if data != None:
+        datastr = ''.join([chr(b) for b in data]) # convert bytearray to string
+        print(datastr)
+    sleep(5)
