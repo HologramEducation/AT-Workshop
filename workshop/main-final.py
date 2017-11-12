@@ -32,7 +32,7 @@ def resetModem(resetPin):
         setPixel(0,0,255)
         sleep(0.5)
 
-def sendCommand(cmd, wait, success):
+def sendCommand(cmd, wait, success, fail="ERROR"):
     # print helpful feedback with wait time
     print("CMD (~" + str(wait) + " seconds) " + cmd)
     result = uart.write(cmd)
@@ -47,14 +47,19 @@ def sendCommand(cmd, wait, success):
             if data != None:
             	datastr = ''.join([chr(b) for b in data]) # convert bytearray to string
             	response = datastr
-                break
+                if success or fail in response:
+                    break
 
-    if success not in response:
+    if fail in response:
         print("ERROR: " + cmd)
         print(response)
         return False
-    else:
+    elif success in response:
         return True
+    else:
+        print("TIMEOUT: " + cmd)
+        return False
+
 
 def disconnect():
     # Disconnect / shutdown modem connection
@@ -99,7 +104,7 @@ def sendMessage(message):
     fullMessage = formatMsg(message, DEVICEKEY)
 
     # Start hologram TCP connection
-    if not sendCommand("AT+CIPSTART=1,\"TCP\",\"" + ip() + "\",\"" + port() + "\"\r\n", 75, "OK"):
+    if not sendCommand("AT+CIPSTART=1,\"TCP\",\"" + ip() + "\",\"" + port() + "\"\r\n", 75, "OK", "FAIL"):
         return False
 
     # Set message length
@@ -108,7 +113,7 @@ def sendMessage(message):
         return False
 
     # Send string to server
-    if not sendCommand(fullMessage, 60, "OK"):
+    if not sendCommand(fullMessage, 60, "OK", "FAIL"):
         return False
 
     return True
