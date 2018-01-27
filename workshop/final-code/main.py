@@ -5,7 +5,7 @@ from time import monotonic, sleep
 from pixel import setPixel
 from hologram import formatMsg, ip, port
 
-DEVICEKEY = "eLI#4[bL"
+DEVICEKEY = "❓❓"
 
 RESET_PIN = DigitalInOut(D2)
 RESET_PIN.direction = Direction.OUTPUT
@@ -189,7 +189,7 @@ print("### SEND MESSAGE ################################")
 
 if NET_CONNECT:
 
-    if sendMessage("Yay, We did it! -benstr"):
+    if sendMessage("Yay, We did it!"):
         print("### SEND MESSAGE SUCCESSFUL ###")
 
     disconnect()

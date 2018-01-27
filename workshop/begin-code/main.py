@@ -189,7 +189,7 @@ print("### SEND MESSAGE ################################")
 
 if NET_CONNECT:
 
-    if sendMessage("Yay, We did it! -benstr"):
+    if sendMessage("Yay, We did it!"):
         print("### SEND MESSAGE SUCCESSFUL ###")
 
     disconnect()
