@@ -5,7 +5,7 @@ from time import monotonic, sleep
 from pixel import setPixel
 from hologram import formatMsg, ip, port
 
-DEVICEKEY = "NdWiNVXi"
+DEVICEKEY = "❓❓"
 
 RESET_PIN = DigitalInOut(D2)
 RESET_PIN.direction = Direction.OUTPUT
@@ -32,7 +32,7 @@ def resetModem(resetPin):
         setPixel(0,0,255)
         sleep(0.5)
 
-def sendCommand(cmd, wait, success, fail="ERROR"):
+def sendCommand(cmd, wait, success="OK", fail="ERROR"):
     # print helpful feedback with wait time
     print("CMD (~" + str(wait) + " seconds) " + cmd)
     result = uart.write(cmd)
@@ -63,14 +63,14 @@ def sendCommand(cmd, wait, success, fail="ERROR"):
 
 
 def disconnect():
-    # Disconnect / shutdown modem connection
+    # C0 - Disconnect / shutdown modem connection
     if not sendCommand("AT+CIPCLOSE=1\r\n", 4, "CLOSE OK"):
         return False
     return True
 
 def connect():
-    # Shutdown modem before bringing it back up
-    if not sendCommand("AT+CIPSHUT\r\n", 65, "SHUT OK"):
+    # C1 - Shutdown modem before bringing it back up
+    if not sendCommand("❓❓", ❓, "❓"):
         return False
 
     # Check signal strength
@@ -78,28 +78,28 @@ def connect():
     # if not sendCommand("AT+CSQ\r\n", 2, "OK"):
     #     return False
 
-    # Check GPRS status
-    if not sendCommand("AT+CGATT?\r\n", 10, "OK"):
+    # C2 - Check GPRS status
+    if not sendCommand("❓❓", ❓):
         return False
 
-    # Set modem mode
-    if not sendCommand("AT+CIPMUX=1\r\n", 2, "OK"):
+    # C3 - Set modem mode
+    if not sendCommand("❓❓", ❓):
         return False
 
-    # Set APN
-    if not sendCommand("AT+CSTT=\"hologram\"\r\n", 2, "OK"):
+    # C4 - Set APN
+    if not sendCommand("❓❓", ❓):
         return False
 
-    # Bring up wireless connection
-    if not sendCommand("AT+CIICR\r\n", 85, "OK"):
+    # C5 - Bring up wireless connection
+    if not sendCommand("❓❓", ❓):
         return False
 
-    # Get local IP address
-    if not sendCommand("AT+CIFSR\r\n", 2, "."):
+    # C6 - Get local IP address
+    if not sendCommand("❓❓", ❓, "❓"):
         return False
 
-    # Start inbound server
-    if not sendCommand("AT+CIPSERVER=1,4010\r\n", 2, "SERVER OK"):
+    # C7 - Start inbound server
+    if not sendCommand("❓❓", ❓, "❓"):
         return False
 
     return True
@@ -108,28 +108,28 @@ def sendMessage(message):
     # format message string
     fullMessage = formatMsg(message, DEVICEKEY)
 
-    # Start hologram TCP connection
-    if not sendCommand("AT+CIPSTART=1,\"TCP\",\"" + ip() + "\",\"" + port() + "\"\r\n", 75, "OK", "FAIL"):
+    # C8 - Start hologram TCP connection
+    if not sendCommand("❓❓❓", ❓, "❓", "❓"):
         return False
 
-    # Set message length
+    # C9 - Set message length
     msgLength = len(fullMessage)
-    if not sendCommand("AT+CIPSEND=1," + str(msgLength) + "\r\n", 5, ">"):
+    if not sendCommand("❓❓", ❓, "❓"):
         return False
 
-    # Send string to server
-    if not sendCommand(fullMessage, 60, "OK", "FAIL"):
+    # C10 - Send string to server
+    if not sendCommand(❓, ❓, "❓", "❓"):
         return False
 
     return True
 
 def sendResponse(responseMsg = "RECEIVE OK"):
-    # Send a message back to server after receiving data
-    if not sendCommand("AT+CIPSEND=0," + str(len(responseMsg)) + "\r\n", 5, ">"):
+    # C11 - Send a message back to server after receiving data
+    if not sendCommand("❓❓", ❓, "❓"):
         return False
 
-    # Send string to server
-    if not sendCommand(responseMsg, 60, "SEND OK"):
+    # C12 - Send string to server
+    if not sendCommand(❓, ❓, "❓"):
         return False
 
     return True
@@ -153,20 +153,20 @@ print("### MODEM CONFIGURE #############################")
 
 while STARTUP:
 
-    # Check UART communication
-    if not sendCommand("AT\r\n", 3, "OK"):
+    # C13 - Check UART communication
+    if not sendCommand("❓❓", ❓):
         break
 
-    # Set cell modules baud rate
-    if not sendCommand("AT+IPR=19200\r\n", 5, "OK"):
+    # C14 - Set cell modules baud rate
+    if not sendCommand("❓❓", ❓):
         break
 
-    # Check if SIM is readable
-    if not sendCommand("AT+CPIN?\r\n", 5, "OK"):
+    # C15 - Check if SIM is readable
+    if not sendCommand("❓❓", ❓):
         break
 
-    # Set SMS to text mode
-    if not sendCommand("AT+CMGF=1\r\n", 10, "OK"):
+    # C16 - Set SMS to text mode
+    if not sendCommand("❓❓", ❓):
         break
 
     print("### MODEM CONFIGURE SUCCESSFUL ###")
@@ -189,7 +189,7 @@ print("### SEND MESSAGE ################################")
 
 if NET_CONNECT:
 
-    if sendMessage("Yay, We did it!"):
+    if sendMessage("Yay, We did it! -benstr"):
         print("### SEND MESSAGE SUCCESSFUL ###")
 
     disconnect()
