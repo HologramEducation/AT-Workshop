@@ -141,6 +141,8 @@ print("### PROJECT STARTUP #############################")
 # UART send "AT\r\n"
 uart = busio.UART(D4, D3, baudrate=19200)
 
+sleep(2)
+
 # reset modem
 print("Modem RST ~45 seconds")
 resetModem(RESET_PIN)

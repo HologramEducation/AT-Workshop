@@ -27,9 +27,9 @@ def resetModem(resetPin):
     resetPin.value = 1
 
     for x in range(0,45): # wait 45 seconds for modem to startup
-        setPixel(0,0,0) # blink RGB
+        setPixel(0,0,255) # blink RGB between blue/pink
         sleep(0.5)
-        setPixel(0,0,255)
+        setPixel(255,105,180) # pink
         sleep(0.5)
 
 def sendCommand(cmd, wait, success="OK", fail="ERROR"):
